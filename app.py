@@ -1,3 +1,4 @@
+import re
 from flask import Flask, request, jsonify, make_response
 from flask_sqlalchemy import SQLAlchemy
 from marshmallow_sqlalchemy import SQLAlchemySchema
@@ -132,21 +133,75 @@ class ProfesoresSchema(SQLAlchemySchema):
 
 @app.route('/alumnos', methods = ['GET'])
 def alumnos():
-    get_alumnos = Alumnos.query.all()
-    alumnos_schema = AlumnosSchema(many=True)
-    alumnos = alumnos_schema.dump(get_alumnos)
-    return make_response(jsonify({"alumno": alumnos}))
+    if request.method == 'GET':
+        get_alumnos = Alumnos.query.all()
+        alumnos_schema = AlumnosSchema(many=True)
+        alumnos = alumnos_schema.dump(get_alumnos)
+        return make_response(jsonify({"alumno": alumnos}))
 
-@app.route('/materias', methods = ['GET'])
+@app.route('/materias', methods = ['GET', 'POST'])
 def materias():
-    get_materias= Materias.query.all()
-    materias_schema = AlumnosSchema(many=True)
-    materias = materias_schema.dump(get_materias)
-    return make_response(jsonify({"materia": materias}))
+    if request.method == 'GET':
+        get_materias= Materias.query.all()
+        materias_schema = AlumnosSchema(many=True)
+        materias = materias_schema.dump(get_materias)
+        return make_response(jsonify({"materia": materias}))
+    elif request.method == 'POST':
+        data = request.get_json()
+        schema = MateriasSchema()
+        materia = schema.load(data)
+        result = schema.dump(materia.create())
+        return make_response(jsonify({"materia": result}),200)
 
-@app.route('/profesores', methods = ['GET'])
-def profesores():
-    get_profesores= Profesores.query.all()
-    profesores_schema = ProfesoresSchema(many=True)
-    profesores = profesores_schema.dump(get_profesores)
-    return make_response(jsonify({"profesor": profesores}))
+@app.route('/materias/<id>', methods = ['PUT', 'DELETE'])
+def materias_2(id):
+    if request.method == 'PUT':
+        materia = Materias.query.get(id)
+
+        materia.clave_materia = request.json('clave_materia')
+        materia.nombre = request.json('nombre')
+        materia.creditos = request.json('creditos')
+
+        db.session.commit()
+        return make_response(jsonify({"materia": materia}))
+    elif request.method == 'DELETE':
+        materia = Materias.query.get(id)
+        db.session.delete(materia)
+        db.session.commit()
+        return MateriasSchema.jsonify(materia)
+
+@app.route('/profesores', methods = ['GET', 'POST'])
+def profesor():
+    if request.method == 'GET':
+        get_profesores= Profesores.query.all()
+        profesores_schema = ProfesoresSchema(many=True)
+        profesores = profesores_schema.dump(get_profesores)
+        return make_response(jsonify({"profesor": profesores}))
+    elif request.method == 'POST':
+        data = request.get_json()
+        schema = ProfesoresSchema()
+        profesor = schema.load(data)
+        result = schema.dump(profesor.create())
+        return make_response(jsonify({"profesor": result}),200)
+
+@app.route('/profesores/<id>', methods = ['PUT', 'DELETE'])
+def profesor_2(id):
+    if request.method == 'PUT':
+        profesor = Profesores.query.get(id)
+
+        profesor.nombre = request.json('nombre')
+        profesor.ap_paterno = request.json('ap_paterno')
+        profesor.num_empleado = request.json('num_empleado')
+        profesor.password = request.json('password')
+        profesor.correo = request.json('correo')
+
+        if request.json('ap_materno'): 
+            profesor.ap_materno = request.json('ap_materno')
+
+        db.session.commit()
+        return make_response(jsonify({"profesor": profesor}))
+    elif request.method == 'DELETE':
+        profesor = Profesores.query.get(id)
+        db.session.delete(profesor)
+        db.session.commit()
+        return ProfesoresSchema.jsonify(profesor)
