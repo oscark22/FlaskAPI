@@ -59,10 +59,10 @@ class AlumnosSchema(SQLAlchemySchema):
 
 class Materias(db.Model):
    __tablename__ = "materias"
-   id_materia = db.Column(db.SmallInteger, primary_key=True)
+   id_materia = db.Column(db.Integer, primary_key=True)
    clave_materia = db.Column(db.String(6))
    nombre = db.Column(db.String(30))
-   creditos = db.Column(db.Integer)
+   creditos = db.Column(db.SmallInteger)
 
    def create(self):
      db.session.add(self)
@@ -131,8 +131,22 @@ class ProfesoresSchema(SQLAlchemySchema):
 
 
 @app.route('/alumnos', methods = ['GET'])
-def index():
+def alumnos():
     get_alumnos = Alumnos.query.all()
     alumnos_schema = AlumnosSchema(many=True)
     alumnos = alumnos_schema.dump(get_alumnos)
     return make_response(jsonify({"alumno": alumnos}))
+
+@app.route('/materias', methods = ['GET'])
+def materias():
+    get_materias= Materias.query.all()
+    materias_schema = AlumnosSchema(many=True)
+    materias = materias_schema.dump(get_materias)
+    return make_response(jsonify({"materia": materias}))
+
+@app.route('/profesores', methods = ['GET'])
+def profesores():
+    get_profesores= Profesores.query.all()
+    profesores_schema = ProfesoresSchema(many=True)
+    profesores = profesores_schema.dump(get_profesores)
+    return make_response(jsonify({"profesor": profesores}))
