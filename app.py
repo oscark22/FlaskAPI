@@ -1,7 +1,7 @@
 import re
 from flask import Flask, request, jsonify, make_response
 from flask_sqlalchemy import SQLAlchemy
-from marshmallow_sqlalchemy import SQLAlchemySchema
+from marshmallow_sqlalchemy import SQLAlchemySchema, auto_field
 from marshmallow import fields
 from dotenv import load_dotenv
 import os
@@ -50,8 +50,10 @@ class AlumnosSchema(SQLAlchemySchema):
     class Meta(SQLAlchemySchema.Meta):
         model = Alumnos
         sqla_session = db.session
+        include_relationships = True
+        load_instance = True
 
-    id_alumno = fields.Number(dump_only = True)
+    id_alumno = auto_field(dump_only = True)
     matricula = fields.String(required = True)
     ap_paterno = fields.String(required = True)
     ap_materno = fields.String(required = True)
@@ -83,8 +85,10 @@ class MateriasSchema(SQLAlchemySchema):
     class Meta(SQLAlchemySchema.Meta):
         model = Materias
         sqla_session = db.session
+        include_relationships = True
+        load_instance = True
 
-    id_materia = fields.Number(dump_only = True)
+    id_materia = auto_field(dump_only = True)
     clave_materia = fields.String(required = True)
     nombre = fields.String(required = True)
     creditos = fields.Number(required = True)
@@ -121,8 +125,10 @@ class ProfesoresSchema(SQLAlchemySchema):
     class Meta(SQLAlchemySchema.Meta):
         model = Profesores
         sqla_session = db.session
+        include_relationships = True
+        load_instance = True
 
-    id_profesor = fields.Number(dump_only = True)
+    id_profesor = auto_field(dump_only = True)
     nombre = fields.String(required = True)
     ap_paterno = fields.String(required = True)
     ap_materno = fields.String(required = False)
@@ -231,7 +237,10 @@ class GruposSchema(SQLAlchemySchema):
     class Meta(SQLAlchemySchema.Meta):
         model = Grupos
         sqla_session = db.session
-    id_grupo = fields.Number(dump_only = True)
+        include_relationships = True
+        load_instance = True
+
+    auto_field(dump_only = True)
     numero_grupo = fields.String(required = True)
     id_profesor = fields.Number(required = True)
     id_periodo = fields.Number(required = True)
