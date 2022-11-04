@@ -314,7 +314,7 @@ class AlumnoGrupoSchema(SQLAlchemySchema):
     id_grupo = fields.String(required = True)
 
 @app.route('/alumno_grupo', methods = ['GET']) #Agregar parametro del criterio que necesitamos
-def index():
+def index2():
     get_alumno_grupo = AlumnoGrupo.query.all()
     alumno_grupo_schema = AlumnoGrupoSchema(many=True)
     alumno_grupo = alumno_grupo_schema.dump(get_alumno_grupo)
