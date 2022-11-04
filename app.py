@@ -217,8 +217,8 @@ class Grupo(db.Model):
     id_grupo = db.Column(db.Integer, primary_key=True)
     numero_grupo = db.Column(db.String(30))
     id_profesor = db.Column(db.Integer, db.ForeignKey('profesores.id_profesor'))
-    id_materia = db.Column(db.Integer, db.ForeignKey('materia.id_materia'))
-    id_periodo = db.Column(db.Integer, db.ForeignKey('periodos.id_periodo'))
+    id_materia = db.Column(db.Integer, db.ForeignKey('materias.id_materia'))
+    id_periodo = db.Column(db.Integer, db.ForeignKey('periodo.id_periodo'))
     def create(self):
         db.session.add(self)
         db.session.commit()
