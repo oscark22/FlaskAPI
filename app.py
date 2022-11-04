@@ -282,3 +282,38 @@ def update_grupo_by_id(id):
    grupo_schema = GruposSchema(only=['id_grupo', 'numero_grupo', 'id_profesor','id_periodo','id_materia'])
    grupo = grupo_schema.dump(get_grupo)
    return make_response(jsonify({"grupo": grupo}))
+
+class AlumnoGrupo(db.Model):
+   __tablename__ = "alumno_grupo"
+   id_alumno_grupo = db.Column(db.Integer, primary_key=True)
+   id_alumno = db.Column(db.Integer, db.ForeignKey('alumnos.id_alumno'))
+   id_grupo = db.Column(db.Integer, db.ForeignKey('grupos.id_grupo'))
+ 
+   def create(self):
+     db.session.add(self)
+     db.session.commit()
+     return self
+ 
+   def __init__(self, id_alumno_grupo, id_alumno, id_grupo):
+       self.id_alumno_grupo  = id_alumno_grupo
+       self.id_alumno = id_alumno
+       self.id_grupo = id_grupo
+ 
+   def __repr__(self):
+       return '' % self.id_alumno_grupo
+
+class AlumnoGrupoSchema(SQLAlchemySchema):
+    class Meta(SQLAlchemySchema.Meta):
+        model = AlumnoGrupo
+        sqla_session = db.session
+
+    id_alumno_grupo = fields.Number(dump_only = True)
+    id_alumno = fields.String(required = True)
+    id_grupo = fields.String(required = True)
+
+@app.route('/alumno_grupo', methods = ['GET']) #Agregar parametro del criterio que necesitamos
+def index():
+    get_alumno_grupo = AlumnoGrupo.query.all()
+    alumno_grupo_schema = AlumnoGrupoSchema(many=True)
+    alumno_grupo = alumno_grupo_schema.dump(get_alumno_grupo)
+    return make_response(jsonify({"alumno_grupo": alumno_grupo}))
