@@ -213,7 +213,7 @@ def profesor_2(id):
         return ProfesoresSchema.jsonify(profesor)
 
 
-class Grupos(db.Model):
+class Grupo(db.Model):
     __tablename__ = "grupos"
     id_grupo = db.Column(db.Integer, primary_key=True)
     numero_grupo = db.Column(db.String(30))
@@ -235,7 +235,7 @@ class Grupos(db.Model):
 
 class GruposSchema(SQLAlchemySchema):
     class Meta(SQLAlchemySchema.Meta):
-        model = Grupos
+        model = Grupo
         sqla_session = db.session
         include_relationships = True
         load_instance = True
@@ -248,7 +248,7 @@ class GruposSchema(SQLAlchemySchema):
 
 @app.route('/grupos', methods = ['GET'])
 def index():
-	get_Grupos = Grupos.query.all()
+	get_Grupos = Grupo.query.all()
 	Grupos_schema = GruposSchema(many=True)
 	Grupos = Grupos_schema.dump(get_Grupos)
 	return make_response(jsonify({"grupos": Grupos}))
