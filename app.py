@@ -73,7 +73,7 @@ class Materias(db.Model):
      return self
  
    def __init__(self, clave_materia, nombre, creditos):
-       self.clave_materia  = clave_materia
+       self.clave_materia = clave_materia
        self.nombre = nombre
        self.creditos = creditos
  
@@ -149,7 +149,7 @@ def alumnos():
 def materias():
     if request.method == 'GET':
         get_materias= Materias.query.all()
-        materias_schema = AlumnosSchema(many=True)
+        materias_schema = MateriasSchema(many=True)
         materias = materias_schema.dump(get_materias)
         return make_response(jsonify({"materia": materias}))
     elif request.method == 'POST':
@@ -319,3 +319,4 @@ def index2():
     alumno_grupo_schema = AlumnoGrupoSchema(many=True)
     alumno_grupo = alumno_grupo_schema.dump(get_alumno_grupo)
     return make_response(jsonify({"alumno_grupo": alumno_grupo}))
+
