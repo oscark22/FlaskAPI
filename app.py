@@ -137,6 +137,71 @@ class ProfesoresSchema(SQLAlchemySchema):
     correo = fields.String(required = True)
 
 
+class Grupos(db.Model):
+    __tablename__ = "grupos"
+    id_grupo = db.Column(db.Integer, primary_key=True)
+    numero_grupo = db.Column(db.String(30))
+    id_profesor = db.Column(db.Integer, db.ForeignKey('profesores.id_profesor'))
+    id_materia = db.Column(db.Integer, db.ForeignKey('materia.id_materia'))
+    id_periodo = db.Column(db.Integer, db.ForeignKey('periodo.id_periodo'))
+    def create(self):
+        db.session.add(self)
+        db.session.commit()
+        return self
+    def __init__(self, numero_grupo, id_profesor, id_materia, id_periodo):
+        self.id_periodo  = id_periodo
+        self.numero_grupo = numero_grupo
+        self.id_materia = id_materia
+        self.id_profesor = id_profesor
+    def __repr__(self):
+        return '' % self.id_grupo
+    #db.create_all()
+
+class GruposSchema(SQLAlchemySchema):
+    class Meta(SQLAlchemySchema.Meta):
+        model = Grupos
+        sqla_session = db.session
+        include_relationships = True
+        load_instance = True
+
+    id_grupo = auto_field(dump_only = True)
+    numero_grupo = fields.String(required = True)
+    id_profesor = fields.Number(required = True)
+    id_periodo = fields.Number(required = True)
+    id_materia = fields.Number(required = True)
+
+
+class AlumnoGrupo(db.Model):
+   __tablename__ = "alumno_grupo"
+   id_alumno_grupo = db.Column(db.Integer, primary_key=True)
+   id_alumno = db.Column(db.Integer, db.ForeignKey('alumnos.id_alumno'))
+   id_grupo = db.Column(db.Integer, db.ForeignKey('grupos.id_grupo'))
+ 
+   def create(self):
+     db.session.add(self)
+     db.session.commit()
+     return self
+ 
+   def __init__(self, id_alumno_grupo, id_alumno, id_grupo):
+       self.id_alumno_grupo  = id_alumno_grupo
+       self.id_alumno = id_alumno
+       self.id_grupo = id_grupo
+ 
+   def __repr__(self):
+       return '' % self.id_alumno_grupo
+
+class AlumnoGrupoSchema(SQLAlchemySchema):
+    class Meta(SQLAlchemySchema.Meta):
+        model = AlumnoGrupo
+        sqla_session = db.session
+        include_relationships = True
+        load_instance = True
+
+    id_alumno_grupo = auto_field(dump_only = True)
+    id_alumno = fields.String(required = True)
+    id_grupo = fields.String(required = True)
+
+    
 @app.route('/alumnos', methods = ['GET'])
 def alumnos():
     if request.method == 'GET':
@@ -212,40 +277,6 @@ def profesor_2(id):
         db.session.commit()
         return ProfesoresSchema.jsonify(profesor)
 
-
-class Grupos(db.Model):
-    __tablename__ = "grupos"
-    id_grupo = db.Column(db.Integer, primary_key=True)
-    numero_grupo = db.Column(db.String(30))
-    id_profesor = db.Column(db.Integer, db.ForeignKey('profesores.id_profesor'))
-    id_materia = db.Column(db.Integer, db.ForeignKey('materia.id_materia'))
-    id_periodo = db.Column(db.Integer, db.ForeignKey('periodo.id_periodo'))
-    def create(self):
-        db.session.add(self)
-        db.session.commit()
-        return self
-    def __init__(self, numero_grupo, id_profesor, id_materia, id_periodo):
-        self.id_periodo  = id_periodo
-        self.numero_grupo = numero_grupo
-        self.id_materia = id_materia
-        self.id_profesor = id_profesor
-    def __repr__(self):
-        return '' % self.id_grupo
-    #db.create_all()
-
-class GruposSchema(SQLAlchemySchema):
-    class Meta(SQLAlchemySchema.Meta):
-        model = Grupos
-        sqla_session = db.session
-        include_relationships = True
-        load_instance = True
-
-    id_grupo = auto_field(dump_only = True)
-    numero_grupo = fields.String(required = True)
-    id_profesor = fields.Number(required = True)
-    id_periodo = fields.Number(required = True)
-    id_materia = fields.Number(required = True)
-
 @app.route('/grupos', methods = ['GET'])
 def index():
 	get_Grupos = Grupos.query.all()
@@ -282,36 +313,6 @@ def update_grupo_by_id(id):
    grupo_schema = GruposSchema(only=['id_grupo', 'numero_grupo', 'id_profesor','id_periodo','id_materia'])
    grupo = grupo_schema.dump(get_grupo)
    return make_response(jsonify({"grupo": grupo}))
-
-class AlumnoGrupo(db.Model):
-   __tablename__ = "alumno_grupo"
-   id_alumno_grupo = db.Column(db.Integer, primary_key=True)
-   id_alumno = db.Column(db.Integer, db.ForeignKey('alumnos.id_alumno'))
-   id_grupo = db.Column(db.Integer, db.ForeignKey('grupos.id_grupo'))
- 
-   def create(self):
-     db.session.add(self)
-     db.session.commit()
-     return self
- 
-   def __init__(self, id_alumno_grupo, id_alumno, id_grupo):
-       self.id_alumno_grupo  = id_alumno_grupo
-       self.id_alumno = id_alumno
-       self.id_grupo = id_grupo
- 
-   def __repr__(self):
-       return '' % self.id_alumno_grupo
-
-class AlumnoGrupoSchema(SQLAlchemySchema):
-    class Meta(SQLAlchemySchema.Meta):
-        model = AlumnoGrupo
-        sqla_session = db.session
-        include_relationships = True
-        load_instance = True
-
-    id_alumno_grupo = auto_field(dump_only = True)
-    id_alumno = fields.String(required = True)
-    id_grupo = fields.String(required = True)
 
 @app.route('/alumno_grupo', methods = ['GET']) #Agregar parametro del criterio que necesitamos
 def index2():
