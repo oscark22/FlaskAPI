@@ -294,7 +294,7 @@ def create_grupo():
 @app.route('/grupos/<id>', methods = ['PUT'])
 def update_grupo_by_id(id):
    data = request.get_json()
-   get_grupo = Grupos.query.get(id)
+   get_grupo = Grupo.query.get(id)
    if data.get('numero_grupo'):
        get_grupo.numero_grupo = data['numero_grupo']
 
