@@ -261,7 +261,7 @@ def create_grupo():
    result = Grupos_schema.dump(grupo.create())
    return make_response(jsonify({"grupo": result}),200)
 
-@app.route('/grupos/' + id, methods = ['PUT'])
+@app.route('/grupos/<id>', methods = ['PUT'])
 def update_grupo_by_id(id):
    data = request.get_json()
    get_grupo = Grupos.query.get(id)
