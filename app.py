@@ -136,41 +136,6 @@ class ProfesoresSchema(SQLAlchemySchema):
     password = fields.String(required = True)
     correo = fields.String(required = True)
 
-
-class Grupos(db.Model):
-    __tablename__ = "grupos"
-    id_grupo = db.Column(db.Integer, primary_key=True)
-    numero_grupo = db.Column(db.String(30))
-    id_profesor = db.Column(db.Integer, db.ForeignKey('profesores.id_profesor'))
-    id_materia = db.Column(db.Integer, db.ForeignKey('materia.id_materia'))
-    id_periodo = db.Column(db.Integer, db.ForeignKey('periodo.id_periodo'))
-    def create(self):
-        db.session.add(self)
-        db.session.commit()
-        return self
-    def __init__(self, numero_grupo, id_profesor, id_materia, id_periodo):
-        self.id_periodo  = id_periodo
-        self.numero_grupo = numero_grupo
-        self.id_materia = id_materia
-        self.id_profesor = id_profesor
-    def __repr__(self):
-        return '' % self.id_grupo
-    #db.create_all()
-
-class GruposSchema(SQLAlchemySchema):
-    class Meta(SQLAlchemySchema.Meta):
-        model = Grupos
-        sqla_session = db.session
-        include_relationships = True
-        load_instance = True
-
-    id_grupo = auto_field(dump_only = True)
-    numero_grupo = fields.String(required = True)
-    id_profesor = fields.Number(required = True)
-    id_periodo = fields.Number(required = True)
-    id_materia = fields.Number(required = True)
-
-
 class AlumnoGrupo(db.Model):
    __tablename__ = "alumno_grupo"
    id_alumno_grupo = db.Column(db.Integer, primary_key=True)
@@ -315,8 +280,8 @@ class GruposSchema(SQLAlchemySchema):
 def index():
 	get_Grupos = Grupo.query.all()
 	Grupos_schema = GruposSchema(many=True)
-	Grupos = Grupos_schema.dump(get_Grupos)
-	return make_response(jsonify({"grupos": Grupos}))
+	grupos = Grupos_schema.dump(get_Grupos)
+	return make_response(jsonify({"grupos": grupos}))
 
 @app.route('/grupos', methods = ['POST'])
 def create_grupo():
