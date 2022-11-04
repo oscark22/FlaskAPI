@@ -240,7 +240,7 @@ class GruposSchema(SQLAlchemySchema):
         include_relationships = True
         load_instance = True
 
-    auto_field(dump_only = True)
+    id_grupo = auto_field(dump_only = True)
     numero_grupo = fields.String(required = True)
     id_profesor = fields.Number(required = True)
     id_periodo = fields.Number(required = True)
@@ -306,8 +306,10 @@ class AlumnoGrupoSchema(SQLAlchemySchema):
     class Meta(SQLAlchemySchema.Meta):
         model = AlumnoGrupo
         sqla_session = db.session
+        include_relationships = True
+        load_instance = True
 
-    id_alumno_grupo = fields.Number(dump_only = True)
+    id_alumno_grupo = auto_field(dump_only = True)
     id_alumno = fields.String(required = True)
     id_grupo = fields.String(required = True)
 
