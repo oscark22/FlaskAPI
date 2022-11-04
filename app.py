@@ -65,7 +65,7 @@ class Materias(db.Model):
    id_materia = db.Column(db.Integer, primary_key=True)
    clave_materia = db.Column(db.String(6))
    nombre = db.Column(db.String(30))
-   creditos = db.Column(db.SmallInteger)
+   creditos = db.Column(db.Integer)
 
    def create(self):
      db.session.add(self)
