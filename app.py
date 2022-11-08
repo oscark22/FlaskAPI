@@ -306,8 +306,10 @@ class AlumnoGrupoSchema(SQLAlchemySchema):
 @app.route('/alumno_grupo/<id>', methods = ['GET', 'PUT', 'DELETE'])
 def AlumnoGrupoMethods1(id):
     if request.method == 'GET':
-        alumno_grupo = AlumnoGrupo.query.get(id)
-        return make_response(jsonify({"alumno_grupo": alumno_grupo.id_grupo}),200)
+        get_alumno_grupo = AlumnoGrupo.query.all(id)
+        AlumnoGrupoSchema = AlumnoGrupoSchema(many = True)
+        alumno_grupo = AlumnoGrupoSchema.dump(get_alumno_grupo)
+        return make_response(jsonify({"alumno_grupo": alumno_grupo}))
     elif request.method == 'PUT':
         data = request.get_json()
         alumno_grupo = AlumnoGrupo.query.get(id)
