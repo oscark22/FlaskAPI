@@ -321,11 +321,16 @@ def AlumnoGrupoMethods1(id):
             alumno_grupo.id_grupo = data['id_grupo']
         if data.get('id_alumno'):
             alumno_grupo.id_alumno = data['id_alumno']
+        db.session.add(alumno_grupo)
+        db.session.commit()
+        AlumnoGrupo_schema = AlumnoGrupoSchema(only=['id_alumno','id_grupo'])
+        result = AlumnoGrupo_schema.dump(alumno_grupo)
+        return make_response(jsonify({"asistencia": result}))
     elif request.method == 'DELETE':
         alumno_grupo = AlumnoGrupo.query.get(id)
         db.session.delete(alumno_grupo)
         db.session.commit()
-        return MateriasSchema.jsonify(alumno_grupo)
+        return AlumnoGrupoSchema.jsonify(alumno_grupo)
 
 @app.route('/alumno_grupo/<id>', methods = ['POST'])
 def AlumnoGrupoMethods2(id):
