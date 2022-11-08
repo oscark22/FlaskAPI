@@ -171,7 +171,7 @@ def materias_2(id):
     db.session.add(materia)
     db.session.commit()
     schema = ProfesoresSchema()
-    result = schema.dump(schema)
+    result = schema.dump(materia)
     return make_response(jsonify({"materia": result}),200)
 
 @app.route('/profesores', methods = ['GET', 'POST'])
@@ -181,6 +181,7 @@ def profesor():
         profesores_schema = ProfesoresSchema(many=True)
         profesores = profesores_schema.dump(get_profesores)
         return make_response(jsonify({"profesor": profesores}))
+
     elif request.method == 'POST':
         data = request.get_json()
         schema = ProfesoresSchema()
@@ -203,7 +204,7 @@ def profesor_2(id):
     db.session.add(profesor)
     db.session.commit()
     schema = ProfesoresSchema()
-    result = schema.dump(schema)
+    result = schema.dump(profesor)
     return make_response(jsonify({"profesor": result}))
 
 class Grupo(db.Model):
