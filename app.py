@@ -156,20 +156,23 @@ def materias():
         data = request.get_json()
         schema = MateriasSchema()
         materia = schema.load(data)
-        result = schema.dump(materia.create())
-        return make_response(jsonify({"materia": result}),200)
+        materia = schema.dump(materia.create())
+        return make_response(jsonify({"materia": materia}),200)
 
 @app.route('/materias/<int:id>', methods = ['PUT'])
 def materias_2(id):
-    if request.method == 'PUT':
-        materia = Materias.query.get(id)
+    data = request.get_json()
+    materia = Materias.query.get(id)
 
-        materia.clave_materia = request.json('clave_materia')
-        materia.nombre = request.json('nombre')
-        materia.creditos = request.json('creditos')
-
-        db.session.commit()
-        return make_response(jsonify({"materia": materia}))
+    if 'clave_materia' in data:   materia.clave_materia = data['clave_materia']
+    if 'nombre' in data:          materia.nombre = data['nombre']
+    if 'creditos' in data:        materia.creditos = data['creditos']
+    
+    db.session.add(materia)
+    db.session.commit()
+    schema = ProfesoresSchema()
+    result = schema.dump(materia)
+    return make_response(jsonify({"materia": result}),200)
 
 @app.route('/profesores', methods = ['GET', 'POST'])
 def profesor():
@@ -178,6 +181,7 @@ def profesor():
         profesores_schema = ProfesoresSchema(many=True)
         profesores = profesores_schema.dump(get_profesores)
         return make_response(jsonify({"profesor": profesores}))
+
     elif request.method == 'POST':
         data = request.get_json()
         schema = ProfesoresSchema()
@@ -187,21 +191,21 @@ def profesor():
 
 @app.route('/profesores/<int:id>', methods = ['PUT'])
 def profesor_2(id):
-    if request.method == 'PUT':
-        data = request.get_json()
-        profesor = Profesores.query.get(id)
+    data = request.get_json()
+    profesor = Profesores.query.get(id)
+    
+    if 'nombre' in data:        profesor.nombre = data['nombre']
+    if 'ap_paterno' in data:    profesor.ap_paterno = data['ap_paterno']
+    if 'ap_materno' in data:    profesor.ap_materno = data['ap_materno']
+    if 'num_empleado' in data:  profesor.num_empleado = data['num_empleado']
+    if 'password' in data:      profesor.password = data['password']
+    if 'correo' in data:        profesor.correo = data['correo']        
 
-        print(data)
-        
-        if 'nombre' in data:        profesor.nombre = data['nombre']
-        if 'ap_paterno' in data:    profesor.ap_paterno = data['ap_paterno']
-        if 'ap_materno' in data:    profesor.ap_materno = data['ap_materno']
-        if 'num_empleado' in data:  profesor.num_empleado = data['num_empleado']
-        if 'password' in data:      profesor.password = data['password']
-        if 'correo' in data:        profesor.correo = data['correo']        
-
-        db.session.commit()
-        return make_response(jsonify({"profesor": profesor}))
+    db.session.add(profesor)
+    db.session.commit()
+    schema = ProfesoresSchema()
+    result = schema.dump(profesor)
+    return make_response(jsonify({"profesor": result}))
 
 class Grupo(db.Model):
     __tablename__ = "grupos"
