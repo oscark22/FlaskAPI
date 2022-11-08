@@ -196,12 +196,14 @@ def profesor_2(id):
         data = request.get_json()
         profesor = Profesores.query.get(id)
 
-        if data['nombre']: profesor.nombre = data['nombre']
-        if data['ap_paterno']: profesor.ap_paterno = data['ap_paterno']
-        if data['num_empleado']: profesor.num_empleado = data['num_empleado']
-        if data['password']: profesor.password = data['password']
-        if data['correo']: profesor.correo = data['correo']        
-        if data['ap_materno']: profesor.ap_materno = data['ap_materno']
+        print(data, '\n')
+        
+        if 'nombre' in data:        profesor.nombre = data['nombre']
+        if 'ap_paterno' in data:    profesor.ap_paterno = data['ap_paterno']
+        if 'ap_materno' in data:    profesor.ap_materno = data['ap_materno']
+        if 'num_empleado' in data:  profesor.num_empleado = data['num_empleado']
+        if 'password' in data:      profesor.password = data['password']
+        if 'correo' in data:        profesor.correo = data['correo']        
 
         db.session.commit()
         return make_response(jsonify({"profesor": profesor}))
