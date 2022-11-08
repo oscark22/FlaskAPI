@@ -108,13 +108,15 @@ class Profesores(db.Model):
      db.session.commit()
      return self
  
-   def __init__(self, nombre, ap_paterno, ap_materno, num_empleado, password, correo):
+   def __init__(self, nombre, ap_paterno, num_empleado, password, correo, ap_materno='NA'):
         self.nombre = nombre
         self.ap_paterno = ap_paterno
-        self.ap_materno = ap_materno
         self.num_empleado = num_empleado
         self.password = password
         self.correo = correo
+
+        if ap_materno != 'NA':
+            self.ap_materno = ap_materno
 
    def __repr__(self):
        return '' % self.id_profesor
@@ -191,16 +193,15 @@ def profesor():
 @app.route('/profesores/<id>', methods = ['PUT', 'DELETE'])
 def profesor_2(id):
     if request.method == 'PUT':
+        data = request.get_json()
         profesor = Profesores.query.get(id)
 
-        profesor.nombre = request.json('nombre')
-        profesor.ap_paterno = request.json('ap_paterno')
-        profesor.num_empleado = request.json('num_empleado')
-        profesor.password = request.json('password')
-        profesor.correo = request.json('correo')
-
-        if request.json('ap_materno'): 
-            profesor.ap_materno = request.json('ap_materno')
+        if data['nombre']: profesor.nombre = data['nombre']
+        if data['ap_paterno']: profesor.ap_paterno = data['ap_paterno']
+        if data['num_empleado']: profesor.num_empleado = data['num_empleado']
+        if data['password']: profesor.password = data['password']
+        if data['correo']: profesor.correo = data['correo']        
+        if data['ap_materno']: profesor.ap_materno = data['ap_materno']
 
         db.session.commit()
         return make_response(jsonify({"profesor": profesor}))
