@@ -239,7 +239,7 @@ class GruposSchema(SQLAlchemySchema):
 @app.route('/grupos', methods = ['GET'])
 def index():
 	get_Grupos = Grupo.query.all()
-	Grupos_schema = GruposSchema(many=True)
+	Grupos_schema = GruposSchema(many = True)
 	grupos = Grupos_schema.dump(get_Grupos)
 	return make_response(jsonify({"grupos": grupos}))
 
@@ -326,3 +326,78 @@ def AlumnoGrupoMethods2(id):
         AlumGrupo = alumno_grupo.load(data)
         result = alumno_grupo.dump(AlumGrupo.create())
         return make_response(jsonify({"alumno_grupo": result}),200)
+
+class Asistencia(db.Model):
+    _tablename_ = "asistencia"
+    id_asistencia = db.Column(db.Integer, primary_key = True)
+    fecha = db.Column(db.Date)
+    id_tipo_asistencia = db.Column(db.Integer)
+    id_alumno = db.Column(db.Integer)
+    id_horario = db.Column(db.Integer)
+    
+    def create(self):
+     db.session.add(self)
+     db.session.commit()
+     return self
+
+    def _init_(self, id_asistencia, fecha, id_tipo_asistencia, id_alumno, id_horario):
+     self.id_asistencia  = id_asistencia
+     self.fecha = fecha
+     self.id_tipo_asistencia = id_tipo_asistencia
+     self.id_alumno = id_alumno
+     self.id_horario = id_horario    
+
+    def _repr_(self):
+        return '' % self.id_alumno  
+  
+class AsistenciaSchema(SQLAlchemySchema):
+    class Meta(SQLAlchemySchema.Meta):
+      model = Asistencia
+      sqla_session = db.session
+    
+    id_asistencia = fields.Number(dump_only=True)
+    fecha = fields.Date(required=True)
+    id_tipo_asistencia = fields.Number(required=True)
+    id_alumno = fields.Number(required=True)
+    id_horario = fields.Number(required=True)
+
+@app.route('/asistencia', methods = ['GET'])
+def asistencia():
+  get_asistencia = Asistencia.query.all()
+  Asistencia_schema = AsistenciaSchema(many = True)
+  asistencia = Asistencia_schema.dump(get_asistencia)
+  return make_response(jsonify({"asistencia": asistencia}))
+
+@app.route('/asistencia', methods = ['POST'])
+def create_asistencia():
+  data = request.get_json()
+  Asistencia_schema = AsistenciaSchema()
+  asistencia = Asistencia_schema.load(data)
+  result = Asistencia_schema.dump(asistencia).create()
+  return make_response(jsonify({"asistencia": result}),200)
+
+
+@app.route('/asistencia/<id>', methods = ['PUT'])
+def update_asistencia_by_id(id):
+  data = request.get_json()
+  get_asistencia = Asistencia.query.get(id)
+  if data.get('id_asistencia'):
+    get_asistencia.fecha = data['fecha']
+  if data.get('fecha'):
+    get_asistencia.id_tipo_asistencia = data['id_tipo_asistencia']
+  if data.get('id_tipo_asistencia'):
+    get_asistencia.id_alumno = data['id_alumno']
+  if data.get('id_horario'):
+    get_asistencia.price= data['id_horario']   
+  db.session.add(get_asistencia)
+  db.session.commit()
+  Asistencia_schema = AsistenciaSchema(only=['id_asistencia', 'fecha', 'id_tipo_asistencia','id_alumno','id_horario'])
+  asistencia = Asistencia_schema.dump(get_asistencia)
+  return make_response(jsonify({"asistencia": asistencia}))
+
+@app.route('/asistencia/<id>', methods = ['DELETE'])
+def delete_asistencia_by_id(id):
+  get_asistencia = Asistencia.query.get(id)
+  db.session.delete(get_asistencia)
+  db.session.commit()
+  return make_response("",204)
