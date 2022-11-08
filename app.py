@@ -209,7 +209,7 @@ class Grupo(db.Model):
     numero_grupo = db.Column(db.String(30))
     id_profesor = db.Column(db.Integer, db.ForeignKey('ProfesoresSchema.id_profesor'))
     id_materia = db.Column(db.Integer, db.ForeignKey('MateriasSchema.id_materia'))
-    id_periodo = db.Column(db.Integer, db.ForeignKey('periodo.id_periodo'))
+    id_periodo = db.Column(db.Integer, db.ForeignKey('PeriodoSchema.id_periodo'))
     def create(self):
         db.session.add(self)
         db.session.commit()
@@ -406,3 +406,68 @@ def delete_asistencia_by_id(id):
   db.session.delete(get_asistencia)
   db.session.commit()
   return make_response("",204)
+
+
+
+class Periodo(db.Model):
+    __tablename__ = "periodo"
+    id_periodo = db.Column(db.Integer, primary_key = True)
+    nombre = db.Column(db.String(20))
+    inicio = db.Column(db.Date())
+    final = db.Column(db.Date())
+
+    def create(self):
+        db.session.add(self)
+        db.session.commit()
+        return self
+
+    def __init__(self,id_periodo,nombre,inicio,final):
+        self.id_periodo = id_periodo
+        self.nombre = nombre
+        self.inicio = inicio
+        self.final = final
+    def __repr__(self):
+        return '' % self.id_periodo
+
+class PeriodoSchema(SQLAlchemySchema):
+    class Meta(SQLAlchemySchema.Meta):
+        model = Periodo
+        sqla_session = db.session
+
+    id_periodo = fields.Number(dump_only=True)
+    nombre = fields.String(required=True)
+    inicio = fields.Date(required=True)
+    final = fields.Date(required=True)
+
+@app.route('/periodo', methods = ['GET'])
+def periodo():
+    get_periodo = Periodo.query.all()
+    periodo_schema = PeriodoSchema(many = True)
+    periodo = periodo_schema.dump(get_periodo)
+    return make_response(jsonify({"periodo": periodo}))
+
+@app.route('/periodo', methods = ['POST'])
+def create_periodo():
+    data = request.get_json()
+    periodo_schema = PeriodoSchema()
+    periodo = periodo_schema.load(data)
+    result = periodo_schema.dump(periodo.create())
+    return make_response(jsonify({"periodo": result}),200)
+
+@app.route('/periodo/<id>', methods = ['PUT'])
+def update_periodo_by_id(id):
+    data = request.get_json()
+    get_periodo = Periodo.query.get(id)
+    if data.get('id_periodo'):
+        get_periodo.id_periodo = data['id_periodo']
+    if data.get('nombre'):
+        get_periodo.nombre = data['nombre']
+    if data.get('inicio'):
+        get_periodo.inicio = data['inicio']
+    if data.get('final'):
+        get_periodo.final= data['final']   
+    db.session.add(get_periodo)
+    db.session.commit()
+    periodo_schema = PeriodoSchema(only=['id_periodo', 'nombre', 'inicio','final'])
+    periodo = periodo_schema.dump(get_periodo)
+    return make_response(jsonify({"periodo": periodo}))
