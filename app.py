@@ -314,10 +314,26 @@ class AlumnoGrupoSchema(SQLAlchemySchema):
     id_alumno = fields.String(required = True)
     id_grupo = fields.String(required = True)
 
-@app.route('/alumno_grupo', methods = ['GET']) #Agregar parametro del criterio que necesitamos
-def index2():
-    get_alumno_grupo = AlumnoGrupo.query.all()
-    alumno_grupo_schema = AlumnoGrupoSchema(many=True)
-    alumno_grupo = alumno_grupo_schema.dump(get_alumno_grupo)
-    return make_response(jsonify({"alumno_grupo": alumno_grupo}))
+@app.route('/alumno_grupo/<id>', methods = ['GET', 'PUT', 'DELETE'])
+def AlumnoGrupoMethods1(id):
+    if request.method == 'GET':
+        alumno_grupo = AlumnoGrupo.query.get(id)
+        return make_response(jsonify({"alumno_grupo": alumno_grupo.id_grupo}),200)
+    elif request.method == 'PUT':
+        data = request.get_json()
+        alumno_grupo = AlumnoGrupo.query.get(id)
+        alumno_grupo.id_grupo = data['id_grupo']
+    elif request.method == 'DELETE':
+        alumno_grupo = AlumnoGrupo.query.get(id)
+        db.session.delete(alumno_grupo)
+        db.session.commit()
+        return MateriasSchema.jsonify(alumno_grupo)
 
+@app.route('/alumno_grupo/<id>', methods = ['POST'])
+def AlumnoGrupoMethods2(id):
+    if request.method == 'POST':
+        data = request.get_json()
+        alumno_grupo = AlumnoGrupoSchema()
+        AlumGrupo = alumno_grupo.load(data)
+        result = alumno_grupo.dump(AlumGrupo.create())
+        return make_response(jsonify({"alumno_grupo": result}),200)
