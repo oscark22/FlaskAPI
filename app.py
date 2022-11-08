@@ -313,7 +313,10 @@ def AlumnoGrupoMethods1(id):
     elif request.method == 'PUT':
         data = request.get_json()
         alumno_grupo = AlumnoGrupo.query.get(id)
-        alumno_grupo.id_grupo = data['id_grupo']
+        if data.get('id_grupo'):
+            alumno_grupo.id_grupo = data['id_grupo']
+        if data.get('id_alumno'):
+            alumno_grupo.id_alumno = data['id_alumno']
     elif request.method == 'DELETE':
         alumno_grupo = AlumnoGrupo.query.get(id)
         db.session.delete(alumno_grupo)
@@ -325,8 +328,8 @@ def AlumnoGrupoMethods2(id):
     if request.method == 'POST':
         data = request.get_json()
         alumno_grupo = AlumnoGrupoSchema()
-        AlumGrupo = alumno_grupo.load(data)
-        result = alumno_grupo.dump(AlumGrupo.create())
+        AlumnoGrupo = alumno_grupo.load(data)
+        result = alumno_grupo.dump(AlumnoGrupo.create())
         return make_response(jsonify({"alumno_grupo": result}),200)
 
 class Asistencia(db.Model):
