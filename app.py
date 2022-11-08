@@ -337,3 +337,220 @@ def AlumnoGrupoMethods2(id):
         AlumGrupo = alumno_grupo.load(data)
         result = alumno_grupo.dump(AlumGrupo.create())
         return make_response(jsonify({"alumno_grupo": result}),200)
+class Horarios(db.Model):
+   __tablename__ = "horarios"
+   id_horario = db.Column(db.Integer, primary_key=True)
+hora_inicio = db.Column(db.Integer, db.ForeignKey('hora_inicio'))
+hora_final = db.Column(db.Integer, db.ForeignKey('hora_final'))
+dia = db.Column(db.Integer, db.ForeignKey('dia'))
+id_grupo = db.Column(db.Integer, db.ForeignKey('id_grupo'))
+   def create(self):
+     db.session.add(self)
+     db.session.commit()
+     return self
+   def __init__(self,id_horario,hora_inicio,hora_final,dia):
+       self.id_horario = id_horario
+       self.hora_inicio = hora_inicio
+       self.hora_final = hora_final
+       self.dia = dia
+   def __repr__(self):
+       return '' % self.id_horario
+db.create_all()
+class HorariosSchema(ModelSchema):
+
+   class Meta(ModelSchema.Meta):
+
+       model = Horarios
+
+       sqla_session = db.session
+         include_relationships = True
+        load_instance = True
+
+   id_horarios = auto_field(dump_only=True)
+
+   horario_inicio = fields.String(required=True)
+
+   horario_final = fields.String(required=True)
+
+   dia = fields.String(required=True)
+   @app.route('/horarios', methods = ['GET'])
+
+def Horarios(id):
+
+   get_products = Horarios.query.all()
+
+   horarios_schema = HorariosSchema(many=True)
+
+   horarios = horarios_shema.dump(get_horarios)
+
+   return make_response(jsonify({"horarios": horarios}))
+@app.route('/products', methods = ['POST'])
+
+def create_horarios():
+
+   data = request.get_json()
+
+ horarios_schema = HorariosSchema()
+
+   horarios = horarios_schema.load(data)
+
+   result = horarios_schema.dump(horarios.create())
+
+   return make_response(jsonify({"horarios": result}),200)
+@app.route('/products/<id>', methods = ['PUT'])
+
+def update_horarios_by_id(id):
+
+   data = request.get_json()
+
+   get_horarios = Horarios.query.get(id)
+
+   if data.get('horarios'):
+
+       get_horarios.title = data['horarios']
+
+   if data.get('id_horario'):
+
+       get_horarios.id_horarios = data['id_horario']
+
+   if data.get('hora_inicio'):
+
+       get_horarios.horario_inicio = data['hora_inicio']
+
+   if data.get('hora_final'):
+
+       get_horarios.price= data['hora_final']
+         if data.get('dia'):
+
+       get_horarios.price= data['dia']   
+
+   db.session.add(get_horarios)
+
+   db.session.commit()
+
+   horarios_schema = Horarios_Schema(only=['horarios', 'id_horario', 'hora_inicio','hora_final','dia'])
+
+   horarios = horarios_schema.dump(get_horarios)
+
+   return make_response(jsonify({"horarios": horarios}))
+@app.route('/horarios/<id>', methods = ['DELETE'])
+
+def delete_horarios_by_id(id):
+
+   get_horarios = Horarios.query.get(id)
+
+   db.session.delete(get_horarios)
+
+   db.session.commit()
+
+   return make_response("",204)
+
+class Periodo(db.Model):
+
+   __tablename__ = "periodo"
+
+   id_periodo = db.Column(db.Integer, primary_key=True)
+
+   nombre = db.Column(db.String(20))
+
+   inicio = db.Column(db.String(100))
+
+   final = db.Column(db.String(20))
+
+
+   def create(self):
+
+     db.session.add(self)
+
+     db.session.commit()
+
+     return self
+
+   def __init__(self,id_periodo,nombre,inicio,final):
+
+       self.id_periodo = id_periodo
+
+       self.nombre = nombre
+       self.inicio = inicio
+
+       self.final = final
+
+   def __repr__(self):
+
+       return '' % self.id_periodo
+
+db.create_all()
+
+class PeriodoSchema(ModelSchema):
+
+   class Meta(ModelSchema.Meta):
+
+       model = Periodo
+
+       sqla_session = db.session
+
+   id_periodo = fields.Number(dump_only=True)
+
+   nombre = fields.String(required=True)
+
+   inicio = fields.String(required=True)
+
+   final = fields.String(required=True)
+   @app.route('/products', methods = ['GET'])
+
+def Periodo(id):
+
+   get_periodo = Periodo.query.all()
+
+   perido_schema = PeriodoSchema(many=True)
+
+   periodo = periodo_schema.dump(get_periodo)
+
+   return make_response(jsonify({"periodo": periodo}))
+@app.route('/products', methods = ['POST'])
+
+def create_periodo():
+
+   data = request.get_json()
+
+   periodo_schema = PeriodoSchema()
+
+   periodo = periodo_schema.load(data)
+
+   result = periodo_schema.dump(periodo.create())
+
+   return make_response(jsonify({"periodo": result}),200)
+@app.route('/products/<id>', methods = ['PUT'])
+
+def update_periodo_by_id(id):
+
+   data = request.get_json()
+
+   get_periodo = Periodo.query.get(id)
+
+   if data.get('id_periodo'):
+
+       get_eriodo.id_periodo = data['id_periodo']
+
+   if data.get('nombre'):
+
+       get_periodo.nombre = data['nombre']
+
+   if data.get('inicio'):
+
+       get_periodo.inicio = data['inicio']
+
+   if data.get('final'):
+
+       get_periodo.final= data['final']   
+
+   db.session.add(get_periodo)
+
+   db.session.commit()
+
+   periodo_schema = PeriodoSchema(only=['id_periodo', 'nombre', 'inicio','final'])
+
+   periodo = periodo_schema.dump(get_periodo)
+
+   return make_response(jsonify({"periodo": periodo}))
+      
