@@ -159,7 +159,7 @@ def materias():
         result = schema.dump(materia.create())
         return make_response(jsonify({"materia": result}),200)
 
-@app.route('/materias/<id>', methods = ['PUT', 'DELETE'])
+@app.route('/materias/<int:id>', methods = ['PUT'])
 def materias_2(id):
     if request.method == 'PUT':
         materia = Materias.query.get(id)
@@ -170,11 +170,6 @@ def materias_2(id):
 
         db.session.commit()
         return make_response(jsonify({"materia": materia}))
-    elif request.method == 'DELETE':
-        materia = Materias.query.get(id)
-        db.session.delete(materia)
-        db.session.commit()
-        return MateriasSchema.jsonify(materia)
 
 @app.route('/profesores', methods = ['GET', 'POST'])
 def profesor():
@@ -190,13 +185,13 @@ def profesor():
         result = schema.dump(profesor.create())
         return make_response(jsonify({"profesor": result}),200)
 
-@app.route('/profesores/<id>', methods = ['PUT', 'DELETE'])
+@app.route('/profesores/<int:id>', methods = ['PUT'])
 def profesor_2(id):
     if request.method == 'PUT':
         data = request.get_json()
         profesor = Profesores.query.get(id)
 
-        print(data, '\n')
+        print(data)
         
         if 'nombre' in data:        profesor.nombre = data['nombre']
         if 'ap_paterno' in data:    profesor.ap_paterno = data['ap_paterno']
@@ -207,12 +202,6 @@ def profesor_2(id):
 
         db.session.commit()
         return make_response(jsonify({"profesor": profesor}))
-    elif request.method == 'DELETE':
-        profesor = Profesores.query.get(id)
-        db.session.delete(profesor)
-        db.session.commit()
-        return ProfesoresSchema.jsonify(profesor)
-
 
 class Grupo(db.Model):
     __tablename__ = "grupos"
