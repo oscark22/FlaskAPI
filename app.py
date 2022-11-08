@@ -164,9 +164,9 @@ def materias_2(id):
     data = request.get_json()
     materia = Materias.query.get(id)
 
-    if data.get('clave_materia'):   materia.clave_materia = data['clave_materia']
-    if data.get('nombre'):          materia.nombre = data['nombre']
-    if data.get('creditos'):        materia.creditos = data['creditos']
+    if 'clave_materia' in data:   materia.clave_materia = data['clave_materia']
+    if 'nombre' in data:          materia.nombre = data['nombre']
+    if 'creditos' in data:        materia.creditos = data['creditos']
     
     db.session.add(materia)
     db.session.commit()
