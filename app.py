@@ -207,75 +207,6 @@ def profesor_2(id):
     result = schema.dump(profesor)
     return make_response(jsonify({"profesor": result}))
 
-class Grupo(db.Model):
-    __tablename__ = "grupos"
-    id_grupo = db.Column(db.Integer, primary_key=True)
-    numero_grupo = db.Column(db.String(30))
-    id_profesor = db.Column(db.Integer, db.ForeignKey('ProfesoresSchema.id_profesor'))
-    id_materia = db.Column(db.Integer, db.ForeignKey('MateriasSchema.id_materia'))
-    id_periodo = db.Column(db.Integer, db.ForeignKey('PeriodoSchema.id_periodo'))
-    def create(self):
-        db.session.add(self)
-        db.session.commit()
-        return self
-    def __init__(self, numero_grupo, id_profesor, id_materia, id_periodo):
-        self.id_periodo  = id_periodo
-        self.numero_grupo = numero_grupo
-        self.id_materia = id_materia
-        self.id_profesor = id_profesor
-    def __repr__(self):
-        return '' % self.id_grupo
-    #db.create_all()
-
-class GruposSchema(SQLAlchemySchema):
-    class Meta(SQLAlchemySchema.Meta):
-        model = Grupo
-        sqla_session = db.session
-        include_relationships = True
-        load_instance = True
-
-    id_grupo = auto_field(dump_only = True)
-    numero_grupo = fields.String(required = True)
-    id_profesor = fields.Number(required = True)
-    id_periodo = fields.Number(required = True)
-    id_materia = fields.Number(required = True)
-
-@app.route('/grupos', methods = ['GET'])
-def index():
-	get_Grupos = Grupo.query.all()
-	Grupos_schema = GruposSchema(many = True)
-	grupos = Grupos_schema.dump(get_Grupos)
-	return make_response(jsonify({"grupos": grupos}))
-
-@app.route('/grupos', methods = ['POST'])
-def create_grupo():
-   data = request.get_json()
-   Grupos_schema = GruposSchema()
-   grupo = Grupos_schema.load(data)
-   result = Grupos_schema.dump(grupo.create())
-   return make_response(jsonify({"grupo": result}),200)
-
-@app.route('/grupos/<id>', methods = ['PUT'])
-def update_grupo_by_id(id):
-   data = request.get_json()
-   get_grupo = Grupo.query.get(id)
-   if data.get('numero_grupo'):
-       get_grupo.numero_grupo = data['numero_grupo']
-
-   if data.get('id_profesor'):
-       get_grupo.id_profesor = data['id_profesor']
-
-   if data.get('id_periodo'):
-       get_grupo.id_periodo = data['id_periodo']
-
-   if data.get('id_materia'):
-       get_grupo.id_materia= data['id_materia']   
-       
-   db.session.add(get_grupo)
-   db.session.commit()
-   grupo_schema = GruposSchema(only=['id_grupo', 'numero_grupo', 'id_profesor','id_periodo','id_materia'])
-   grupo = grupo_schema.dump(get_grupo)
-   return make_response(jsonify({"grupo": grupo}))
 
 class AlumnoGrupo(db.Model):
    __tablename__ = "alumno_grupo"
@@ -480,3 +411,75 @@ def update_periodo_by_id(id):
     periodo_schema = PeriodoSchema(only=['id_periodo', 'nombre', 'inicio','final'])
     periodo = periodo_schema.dump(get_periodo)
     return make_response(jsonify({"periodo": periodo}))
+
+
+class Grupo(db.Model):
+    __tablename__ = "grupos"
+    id_grupo = db.Column(db.Integer, primary_key=True)
+    numero_grupo = db.Column(db.String(30))
+    id_profesor = db.Column(db.Integer, db.ForeignKey(Profesores.id_profesor))
+    id_materia = db.Column(db.Integer, db.ForeignKey(Materias.id_materia))
+    id_periodo = db.Column(db.Integer, db.ForeignKey(Periodo.id_periodo))
+    def create(self):
+        db.session.add(self)
+        db.session.commit()
+        return self
+    def __init__(self, numero_grupo, id_profesor, id_materia, id_periodo):
+        self.id_periodo  = id_periodo
+        self.numero_grupo = numero_grupo
+        self.id_materia = id_materia
+        self.id_profesor = id_profesor
+    def __repr__(self):
+        return '' % self.id_grupo
+
+class GruposSchema(SQLAlchemySchema):
+    class Meta(SQLAlchemySchema.Meta):
+        model = Grupo
+        sqla_session = db.session
+        include_relationships = True
+        load_instance = True
+
+    id_grupo = auto_field(dump_only = True)
+    numero_grupo = fields.String(required = True)
+    id_profesor = fields.Number(required = True)
+    id_periodo = fields.Number(required = True)
+    id_materia = fields.Number(required = True)
+
+@app.route('/grupos', methods = ['GET'])
+def index():
+	get_Grupos = Grupo.query.all()
+	Grupos_schema = GruposSchema(many = True)
+	grupos = Grupos_schema.dump(get_Grupos)
+	return make_response(jsonify({"grupos": grupos}))
+
+@app.route('/grupos', methods = ['POST'])
+def create_grupo():
+   data = request.get_json()
+   Grupos_schema = GruposSchema()
+   grupo = Grupos_schema.load(data)
+   result = Grupos_schema.dump(grupo.create())
+   return make_response(jsonify({"grupo": result}),200)
+
+@app.route('/grupos/<id>', methods = ['PUT'])
+def update_grupo_by_id(id):
+   data = request.get_json()
+   get_grupo = Grupo.query.get(id)
+   if data.get('numero_grupo'):
+       get_grupo.numero_grupo = data['numero_grupo']
+
+   if data.get('id_profesor'):
+       get_grupo.id_profesor = data['id_profesor']
+
+   if data.get('id_periodo'):
+       get_grupo.id_periodo = data['id_periodo']
+
+   if data.get('id_materia'):
+       get_grupo.id_materia= data['id_materia']   
+       
+   db.session.add(get_grupo)
+   db.session.commit()
+   grupo_schema = GruposSchema(only=['id_grupo', 'numero_grupo', 'id_profesor','id_periodo','id_materia'])
+   grupo = grupo_schema.dump(get_grupo)
+   return make_response(jsonify({"grupo": grupo}))
+
+
