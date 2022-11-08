@@ -344,16 +344,16 @@ hora_inicio = db.Column(db.Integer, db.ForeignKey('hora_inicio'))
 hora_final = db.Column(db.Integer, db.ForeignKey('hora_final'))
 dia = db.Column(db.Integer, db.ForeignKey('dia'))
 id_grupo = db.Column(db.Integer, db.ForeignKey('id_grupo'))
-   def create(self):
+def create(self):
      db.session.add(self)
      db.session.commit()
      return self
-   def __init__(self,id_horario,hora_inicio,hora_final,dia):
+def __init__(self,id_horario,hora_inicio,hora_final,dia):
        self.id_horario = id_horario
        self.hora_inicio = hora_inicio
        self.hora_final = hora_final
        self.dia = dia
-   def __repr__(self):
+def __repr__(self):
        return '' % self.id_horario
 db.create_all()
 class HorariosSchema(ModelSchema):
@@ -363,25 +363,24 @@ class HorariosSchema(ModelSchema):
        model = Horarios
 
        sqla_session = db.session
-         include_relationships = True
-        load_instance = True
+include_relationships = True
+load_instance = True
 
-   id_horarios = auto_field(dump_only=True)
+id_horarios = auto_field(dump_only=True)
 
-   horario_inicio = fields.String(required=True)
+horario_inicio = fields.String(required=True)
 
-   horario_final = fields.String(required=True)
+horario_final = fields.String(required=True)
 
-   dia = fields.String(required=True)
-   @app.route('/horarios', methods = ['GET'])
-
+dia = fields.String(required=True)
+@app.route('/horarios', methods = ['GET'])
 def Horarios(id):
 
-   get_products = Horarios.query.all()
+   get_horarios = Horarios.query.all()
 
    horarios_schema = HorariosSchema(many=True)
 
-   horarios = horarios_shema.dump(get_horarios)
+   horarios = horarios_schema.dump(get_horarios)
 
    return make_response(jsonify({"horarios": horarios}))
 @app.route('/products', methods = ['POST'])
@@ -390,13 +389,13 @@ def create_horarios():
 
    data = request.get_json()
 
- horarios_schema = HorariosSchema()
+horarios_schema = HorariosSchema()
 
-   horarios = horarios_schema.load(data)
+horarios = horarios_schema.load(data)
 
-   result = horarios_schema.dump(horarios.create())
+result = horarios_schema.dump(horarios.create())
 
-   return make_response(jsonify({"horarios": result}),200)
+return make_response(jsonify({"horarios": result}),200)
 @app.route('/products/<id>', methods = ['PUT'])
 
 def update_horarios_by_id(id):
@@ -420,19 +419,16 @@ def update_horarios_by_id(id):
    if data.get('hora_final'):
 
        get_horarios.price= data['hora_final']
-         if data.get('dia'):
+if data.get('dia'):
 
        get_horarios.price= data['dia']   
 
-   db.session.add(get_horarios)
+db.session.add(get_horarios)
+db.session.commit()
+horarios_schema = Horarios_Schema(only=['horarios', 'id_horario', 'hora_inicio','hora_final','dia'])
+horarios = horarios_schema.dump(get_horarios)
 
-   db.session.commit()
-
-   horarios_schema = Horarios_Schema(only=['horarios', 'id_horario', 'hora_inicio','hora_final','dia'])
-
-   horarios = horarios_schema.dump(get_horarios)
-
-   return make_response(jsonify({"horarios": horarios}))
+return make_response(jsonify({"horarios": horarios}))
 @app.route('/horarios/<id>', methods = ['DELETE'])
 
 def delete_horarios_by_id(id):
