@@ -261,7 +261,7 @@ def AlumnoGrupoMethods1(id):
         alumno_grupo = AlumnoGrupo.query.get(id)
         db.session.delete(alumno_grupo)
         db.session.commit()
-        return AlumnoGrupoSchema.jsonify(alumno_grupo)
+        return make_response("",204)
 
 @app.route('/alumno_grupo/<id>', methods = ['POST'])
 def AlumnoGrupoMethods2(id):
@@ -524,7 +524,7 @@ class HorariosSchema(SQLAlchemySchema):
         sqla_session = db.session
         include_relationships = True
         load_instance = True
-    id_horarios = auto_field(dump_only=True)
+    id_horario = auto_field(dump_only=True)
     hora_inicio = fields.Time(required=True)
     hora_final = fields.Time(required=True)
     dia = fields.Number(required = True)
@@ -570,4 +570,4 @@ def delete_horarios_by_id(id):
    get_horarios = Horarios.query.get(id)
    db.session.delete(get_horarios)
    db.session.commit()
-   return make_response("",204)
+   return make_response("", 204)
