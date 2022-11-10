@@ -159,20 +159,26 @@ def materias():
         materia = schema.dump(materia.create())
         return make_response(jsonify({"materia": materia}),200)
 
-@app.route('/materias/<int:id>', methods = ['PUT'])
+@app.route('/materias/<int:id>', methods = ['PUT', 'DELETE'])
 def materias_2(id):
-    data = request.get_json()
-    materia = Materias.query.get(id)
+    if request.method == 'PUT':
+        data = request.get_json()
+        materia = Materias.query.get(id)
 
-    if 'clave_materia' in data:   materia.clave_materia = data['clave_materia']
-    if 'nombre' in data:          materia.nombre = data['nombre']
-    if 'creditos' in data:        materia.creditos = data['creditos']
-    
-    db.session.add(materia)
-    db.session.commit()
-    schema = ProfesoresSchema()
-    result = schema.dump(materia)
-    return make_response(jsonify({"materia": result}),200)
+        if 'clave_materia' in data:   materia.clave_materia = data['clave_materia']
+        if 'nombre' in data:          materia.nombre = data['nombre']
+        if 'creditos' in data:        materia.creditos = data['creditos']
+        
+        db.session.add(materia)
+        db.session.commit()
+        schema = ProfesoresSchema()
+        result = schema.dump(materia)
+        return make_response(jsonify({"materia": result}),200)
+    elif request.method == 'DELETE':
+        materia = Materias.query.get(id)
+        db.session.delete(materia)
+        db.session.commit()
+        return MateriasSchema.jsonify(materia)
 
 @app.route('/profesores', methods = ['GET', 'POST'])
 def profesor():
@@ -181,7 +187,6 @@ def profesor():
         profesores_schema = ProfesoresSchema(many=True)
         profesores = profesores_schema.dump(get_profesores)
         return make_response(jsonify({"profesor": profesores}))
-
     elif request.method == 'POST':
         data = request.get_json()
         schema = ProfesoresSchema()
@@ -189,23 +194,29 @@ def profesor():
         result = schema.dump(profesor.create())
         return make_response(jsonify({"profesor": result}),200)
 
-@app.route('/profesores/<int:id>', methods = ['PUT'])
+@app.route('/profesores/<int:id>', methods = ['PUT', 'DELETE'])
 def profesor_2(id):
-    data = request.get_json()
-    profesor = Profesores.query.get(id)
-    
-    if 'nombre' in data:        profesor.nombre = data['nombre']
-    if 'ap_paterno' in data:    profesor.ap_paterno = data['ap_paterno']
-    if 'ap_materno' in data:    profesor.ap_materno = data['ap_materno']
-    if 'num_empleado' in data:  profesor.num_empleado = data['num_empleado']
-    if 'password' in data:      profesor.password = data['password']
-    if 'correo' in data:        profesor.correo = data['correo']        
+    if request.method == 'PUT':
+        data = request.get_json()
+        profesor = Profesores.query.get(id)
+        
+        if 'nombre' in data:        profesor.nombre = data['nombre']
+        if 'ap_paterno' in data:    profesor.ap_paterno = data['ap_paterno']
+        if 'ap_materno' in data:    profesor.ap_materno = data['ap_materno']
+        if 'num_empleado' in data:  profesor.num_empleado = data['num_empleado']
+        if 'password' in data:      profesor.password = data['password']
+        if 'correo' in data:        profesor.correo = data['correo']        
 
-    db.session.add(profesor)
-    db.session.commit()
-    schema = ProfesoresSchema()
-    result = schema.dump(profesor)
-    return make_response(jsonify({"profesor": result}))
+        db.session.add(profesor)
+        db.session.commit()
+        schema = ProfesoresSchema()
+        result = schema.dump(profesor)
+        return make_response(jsonify({"profesor": result}))
+    elif request.method == 'DELETE':
+        profesor = Profesores.query.get(id)
+        db.session.delete(profesor)
+        db.session.commit()
+        return ProfesoresSchema.jsonify(profesor)
 
 
 class AlumnoGrupo(db.Model):
