@@ -412,6 +412,13 @@ def update_periodo_by_id(id):
     periodo = periodo_schema.dump(get_periodo)
     return make_response(jsonify({"periodo": periodo}))
 
+@app.route('/periodo/<id>', methods = ['DELETE'])
+def delete_periodo_by_id(id):
+  get_periodo = Periodo.query.get(id)
+  db.session.delete(get_periodo)
+  db.session.commit()
+  return make_response("",204)
+
 
 class Grupo(db.Model):
     __tablename__ = "grupos"
@@ -481,6 +488,13 @@ def update_grupo_by_id(id):
    grupo_schema = GruposSchema(only=['id_grupo', 'numero_grupo', 'id_profesor','id_periodo','id_materia'])
    grupo = grupo_schema.dump(get_grupo)
    return make_response(jsonify({"grupo": grupo}))
+
+@app.route('/grupos/<id>', methods = ['DELETE'])
+def delete_grupos_by_id(id):
+  get_grupo = Grupo.query.get(id)
+  db.session.delete(get_grupo)
+  db.session.commit()
+  return make_response("", 204)
 
 
 class Horarios(db.Model):
