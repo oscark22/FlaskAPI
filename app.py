@@ -178,7 +178,7 @@ def materias_2(id):
         materia = Materias.query.get(id)
         db.session.delete(materia)
         db.session.commit()
-        return MateriasSchema.jsonify(materia)
+        return "deleted successfully"
 
 @app.route('/profesores', methods = ['GET', 'POST'])
 def profesor():
@@ -216,7 +216,7 @@ def profesor_2(id):
         profesor = Profesores.query.get(id)
         db.session.delete(profesor)
         db.session.commit()
-        return ProfesoresSchema.jsonify(profesor)
+        return "deleted successfully"
 
 
 class AlumnoGrupo(db.Model):
