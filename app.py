@@ -161,7 +161,7 @@ def materias():
             materias = materias_schema.dump(get_materias)
             return make_response(jsonify({"materia": materias}))
         except (pymysql.err.OperationalError) as e:
-            print(GET_ERROR_TEXT)
+            return make_response(GET_ERROR_TEXT,500)
     elif request.method == 'POST':
         try:
             data = request.get_json()
@@ -170,7 +170,7 @@ def materias():
             materia = schema.dump(materia.create())
             return make_response(jsonify({"materia": materia}),200)
         except (pymysql.err.OperationalError) as e:
-            print(POST_ERROR_TEXT)
+            return make_response(POST_ERROR_TEXT,500)
 
 @app.route('/materias/<int:id>', methods = ['PUT', 'DELETE'])
 def materias_2(id):
@@ -189,15 +189,15 @@ def materias_2(id):
             result = schema.dump(materia)
             return make_response(jsonify({"materia": result}),200)
         except (pymysql.err.OperationalError) as e:
-            print(PUT_ERROR_TEXT)
+            return make_response(PUT_ERROR_TEXT,500)
     elif request.method == 'DELETE':
         try:
             materia = Materias.query.get(id)
             db.session.delete(materia)
             db.session.commit()
-            return "deleted successfully"
+            return make_response("",204)
         except (pymysql.err.OperationalError) as e:
-            print(DELETE_ERROR_TEXT)
+            return make_response(DELETE_ERROR_TEXT,500)
 
 @app.route('/profesores', methods = ['GET', 'POST'])
 def profesor():
@@ -208,7 +208,7 @@ def profesor():
             profesores = profesores_schema.dump(get_profesores)
             return make_response(jsonify({"profesor": profesores}))
         except (pymysql.err.OperationalError) as e:
-            print(GET_ERROR_TEXT)
+            return make_response(GET_ERROR_TEXT,500)
     elif request.method == 'POST':
         try:
             data = request.get_json()
@@ -217,7 +217,7 @@ def profesor():
             result = schema.dump(profesor.create())
             return make_response(jsonify({"profesor": result}),200)
         except (pymysql.err.OperationalError) as e:
-            print(POST_ERROR_TEXT)
+            return make_response(POST_ERROR_TEXT,500)
 
 @app.route('/profesores/<int:id>', methods = ['PUT', 'DELETE'])
 def profesor_2(id):
@@ -239,15 +239,15 @@ def profesor_2(id):
             result = schema.dump(profesor)
             return make_response(jsonify({"profesor": result}))
         except (pymysql.err.OperationalError) as e:
-            print(PUT_ERROR_TEXT)
+            return make_response(PUT_ERROR_TEXT,500)
     elif request.method == 'DELETE':
         try:
             profesor = Profesores.query.get(id)
             db.session.delete(profesor)
             db.session.commit()
-            return "deleted successfully"
+            return make_response("",204)
         except (pymysql.err.OperationalError) as e:
-            print(DELETE_ERROR_TEXT)
+            return make_response(DELETE_ERROR_TEXT,500)
 
 
 class AlumnoGrupo(db.Model):
