@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from marshmallow_sqlalchemy import SQLAlchemySchema, auto_field
 from marshmallow import fields
 from dotenv import load_dotenv
+import pymysql
 import os
 
 
@@ -20,6 +21,12 @@ db = SQLAlchemy()
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI']= f"mysql+pymysql://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 db.init_app(app)
+
+
+GET_ERROR_TEXT = "GET operation could not be performed."
+POST_ERROR_TEXT = "POST operation could not be performed."
+PUT_ERROR_TEXT = "PUT operation could not be performed."
+DELETE_ERROR_TEXT = "DELETE operation could not be performed. Check if this attribute is dependent of another."
 
 
 class Alumnos(db.Model):
@@ -148,75 +155,99 @@ def alumnos():
 @app.route('/materias', methods = ['GET', 'POST'])
 def materias():
     if request.method == 'GET':
-        get_materias= Materias.query.all()
-        materias_schema = MateriasSchema(many=True)
-        materias = materias_schema.dump(get_materias)
-        return make_response(jsonify({"materia": materias}))
+        try:
+            get_materias= Materias.query.all()
+            materias_schema = MateriasSchema(many=True)
+            materias = materias_schema.dump(get_materias)
+            return make_response(jsonify({"materia": materias}))
+        except (pymysql.err.OperationalError) as e:
+            print(GET_ERROR_TEXT)
     elif request.method == 'POST':
-        data = request.get_json()
-        schema = MateriasSchema()
-        materia = schema.load(data)
-        materia = schema.dump(materia.create())
-        return make_response(jsonify({"materia": materia}),200)
+        try:
+            data = request.get_json()
+            schema = MateriasSchema()
+            materia = schema.load(data)
+            materia = schema.dump(materia.create())
+            return make_response(jsonify({"materia": materia}),200)
+        except (pymysql.err.OperationalError) as e:
+            print(POST_ERROR_TEXT)
 
 @app.route('/materias/<int:id>', methods = ['PUT', 'DELETE'])
 def materias_2(id):
     if request.method == 'PUT':
-        data = request.get_json()
-        materia = Materias.query.get(id)
+        try:
+            data = request.get_json()
+            materia = Materias.query.get(id)
 
-        if 'clave_materia' in data:   materia.clave_materia = data['clave_materia']
-        if 'nombre' in data:          materia.nombre = data['nombre']
-        if 'creditos' in data:        materia.creditos = data['creditos']
-        
-        db.session.add(materia)
-        db.session.commit()
-        schema = ProfesoresSchema()
-        result = schema.dump(materia)
-        return make_response(jsonify({"materia": result}),200)
+            if 'clave_materia' in data:   materia.clave_materia = data['clave_materia']
+            if 'nombre' in data:          materia.nombre = data['nombre']
+            if 'creditos' in data:        materia.creditos = data['creditos']
+            
+            db.session.add(materia)
+            db.session.commit()
+            schema = ProfesoresSchema()
+            result = schema.dump(materia)
+            return make_response(jsonify({"materia": result}),200)
+        except (pymysql.err.OperationalError) as e:
+            print(PUT_ERROR_TEXT)
     elif request.method == 'DELETE':
-        materia = Materias.query.get(id)
-        db.session.delete(materia)
-        db.session.commit()
-        return "deleted successfully"
+        try:
+            materia = Materias.query.get(id)
+            db.session.delete(materia)
+            db.session.commit()
+            return "deleted successfully"
+        except (pymysql.err.OperationalError) as e:
+            print(DELETE_ERROR_TEXT)
 
 @app.route('/profesores', methods = ['GET', 'POST'])
 def profesor():
     if request.method == 'GET':
-        get_profesores= Profesores.query.all()
-        profesores_schema = ProfesoresSchema(many=True)
-        profesores = profesores_schema.dump(get_profesores)
-        return make_response(jsonify({"profesor": profesores}))
+        try:
+            get_profesores= Profesores.query.all()
+            profesores_schema = ProfesoresSchema(many=True)
+            profesores = profesores_schema.dump(get_profesores)
+            return make_response(jsonify({"profesor": profesores}))
+        except (pymysql.err.OperationalError) as e:
+            print(GET_ERROR_TEXT)
     elif request.method == 'POST':
-        data = request.get_json()
-        schema = ProfesoresSchema()
-        profesor = schema.load(data)
-        result = schema.dump(profesor.create())
-        return make_response(jsonify({"profesor": result}),200)
+        try:
+            data = request.get_json()
+            schema = ProfesoresSchema()
+            profesor = schema.load(data)
+            result = schema.dump(profesor.create())
+            return make_response(jsonify({"profesor": result}),200)
+        except (pymysql.err.OperationalError) as e:
+            print(POST_ERROR_TEXT)
 
 @app.route('/profesores/<int:id>', methods = ['PUT', 'DELETE'])
 def profesor_2(id):
     if request.method == 'PUT':
-        data = request.get_json()
-        profesor = Profesores.query.get(id)
-        
-        if 'nombre' in data:        profesor.nombre = data['nombre']
-        if 'ap_paterno' in data:    profesor.ap_paterno = data['ap_paterno']
-        if 'ap_materno' in data:    profesor.ap_materno = data['ap_materno']
-        if 'num_empleado' in data:  profesor.num_empleado = data['num_empleado']
-        if 'password' in data:      profesor.password = data['password']
-        if 'correo' in data:        profesor.correo = data['correo']        
+        try:
+            data = request.get_json()
+            profesor = Profesores.query.get(id)
+            
+            if 'nombre' in data:        profesor.nombre = data['nombre']
+            if 'ap_paterno' in data:    profesor.ap_paterno = data['ap_paterno']
+            if 'ap_materno' in data:    profesor.ap_materno = data['ap_materno']
+            if 'num_empleado' in data:  profesor.num_empleado = data['num_empleado']
+            if 'password' in data:      profesor.password = data['password']
+            if 'correo' in data:        profesor.correo = data['correo']        
 
-        db.session.add(profesor)
-        db.session.commit()
-        schema = ProfesoresSchema()
-        result = schema.dump(profesor)
-        return make_response(jsonify({"profesor": result}))
+            db.session.add(profesor)
+            db.session.commit()
+            schema = ProfesoresSchema()
+            result = schema.dump(profesor)
+            return make_response(jsonify({"profesor": result}))
+        except (pymysql.err.OperationalError) as e:
+            print(PUT_ERROR_TEXT)
     elif request.method == 'DELETE':
-        profesor = Profesores.query.get(id)
-        db.session.delete(profesor)
-        db.session.commit()
-        return "deleted successfully"
+        try:
+            profesor = Profesores.query.get(id)
+            db.session.delete(profesor)
+            db.session.commit()
+            return "deleted successfully"
+        except (pymysql.err.OperationalError) as e:
+            print(DELETE_ERROR_TEXT)
 
 
 class AlumnoGrupo(db.Model):
